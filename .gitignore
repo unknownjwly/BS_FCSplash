@@ -1,0 +1,13 @@
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Visual Studio / MSBuild
+.vs/
+*.user
+bin/
+obj/
+
+# Unity / Asset Bundles temp files
+/[Bb]uild/
+/[Bb]uilds/
