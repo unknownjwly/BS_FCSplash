@@ -23,9 +23,8 @@ public class FcSpawner : MonoBehaviour
             _animTimer += Time.deltaTime;
             float progress = Mathf.Clamp01(_animTimer / AnimDuration);
             float scale = EaseOutBack(progress);
-
-            // Increased base scale multiplier from 0.006f to 0.012f to make the whole splash bigger
-            _contentTransform.localScale = new Vector3(0.012f * scale, 0.012f * scale, 0.012f * scale);
+            
+            _contentTransform.localScale = new Vector3(0.010f * scale, 0.010f * scale, 0.010f * scale);
 
             if (progress >= 1f)
             {
@@ -117,7 +116,7 @@ public class FcSpawner : MonoBehaviour
             
             GraphicRaycaster raycaster = _activeCanvas.AddComponent<GraphicRaycaster>();
             
-            _activeCanvas.transform.position = new Vector3(0f, 1.3f, 5.5f);
+            _activeCanvas.transform.position = new Vector3(0f, 1.45f, 5.5f);
             _activeCanvas.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
             GameObject containerObj = new GameObject("SplashContainer");
@@ -193,30 +192,6 @@ public class FcSpawner : MonoBehaviour
             if (customMaterial != null)
             {
                 imageView.material = customMaterial;
-            }
-            else
-            {
-                Material bloomSafeMaterial = new Material(imageView.material);
-                bloomSafeMaterial.name = "FCSplash_BloomSafe";
-                
-                if (bloomSafeMaterial.HasProperty("_SrcBlend"))
-                {
-                    bloomSafeMaterial.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                }
-                if (bloomSafeMaterial.HasProperty("_DstBlend"))
-                {
-                    bloomSafeMaterial.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                }
-                if (bloomSafeMaterial.HasProperty("_EmissionColor"))
-                {
-                    bloomSafeMaterial.SetColor("_EmissionColor", Color.black);
-                }
-                if (bloomSafeMaterial.HasProperty("_Emission"))
-                {
-                    bloomSafeMaterial.SetFloat("_Emission", 0f);
-                }
-                
-                imageView.material = bloomSafeMaterial;
             }
             
             imageView.preserveAspect = true;
