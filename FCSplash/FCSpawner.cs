@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,12 +45,9 @@ public class FcSpawner : MonoBehaviour
     {
         if (_activeCanvas != null)
         {
-            Plugin.Log.Info("Destroying previous active canvas instance.");
             Destroy(_activeCanvas);
         }
 
-        Plugin.Log.Info("Full Combo'd! Spawning splash...");
-        
         try
         {
             string folderPath = Path.Combine(UnityGame.UserDataPath, "FCSplash");
@@ -82,6 +79,7 @@ public class FcSpawner : MonoBehaviour
             if (imagePath != null && File.Exists(imagePath))
             {
                 byte[] fileData = File.ReadAllBytes(imagePath);
+                
                 if (texture.LoadImage(fileData))
                 {
                     texture.filterMode = FilterMode.Bilinear;
@@ -97,8 +95,13 @@ public class FcSpawner : MonoBehaviour
 
             if (!loadSuccess)
             {
-                texture.Reinitialize(2, 2);
-                texture.SetPixels(new[] { Color.green, Color.green, Color.green, Color.green });
+                texture.Reinitialize(256, 256);
+                Color[] greenPixels = new Color[256 * 256];
+                for (int i = 0; i < greenPixels.Length; i++)
+                {
+                    greenPixels[i] = Color.green;
+                }
+                texture.SetPixels(greenPixels);
                 texture.Apply();
             }
 
@@ -107,12 +110,20 @@ public class FcSpawner : MonoBehaviour
             
             Canvas canvas = _activeCanvas.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
+            canvas.sortingOrder = 100;
+            
+            CanvasScaler canvasScaler = _activeCanvas.AddComponent<CanvasScaler>();
+            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            
+            GraphicRaycaster raycaster = _activeCanvas.AddComponent<GraphicRaycaster>();
             
             _activeCanvas.transform.position = new Vector3(0f, 1.3f, 5.5f);
+            _activeCanvas.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
             GameObject containerObj = new GameObject("SplashContainer");
             containerObj.transform.SetParent(_activeCanvas.transform, false);
             containerObj.transform.localPosition = Vector3.zero;
+            containerObj.transform.localRotation = Quaternion.identity;
             _contentTransform = containerObj.transform;
             _contentTransform.localScale = Vector3.zero;
 
@@ -121,23 +132,110 @@ public class FcSpawner : MonoBehaviour
 
             GameObject imageObj = new GameObject("SplashImage");
             imageObj.transform.SetParent(containerObj.transform, false);
+            imageObj.transform.localRotation = Quaternion.identity;
 
-            Image image = imageObj.AddComponent<Image>();
-            image.color = new Color(0.75f, 0.75f, 0.75f, 1f);
+            Image imageView = imageObj.AddComponent<Image>();
+            imageView.color = Color.white;
             
-            // Forces an unlit shader to completely stop post-processing bloom from washing out the texture into a white box
-            image.material = new Material(Shader.Find("Unlit/Texture"));
-            image.preserveAspect = true;
+            Material? customMaterial = null;
+            AssetBundle? bundle = null;
+            
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                string? resourceName = null;
+                
+                foreach (string name in assembly.GetManifestResourceNames())
+                {
+                    if (name.EndsWith("sprite.assetbundle", StringComparison.OrdinalIgnoreCase))
+                    {
+                        resourceName = name;
+                        break;
+                    }
+                }
+                
+                if (resourceName != null)
+                {
+                    using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                    {
+                        if (stream != null)
+                        {
+                            byte[] bundleData = new byte[stream.Length];
+                            stream.Read(bundleData, 0, bundleData.Length);
+                            bundle = AssetBundle.LoadFromMemory(bundleData);
+                        }
+                    }
+                }
+
+                if (bundle != null)
+                {
+                    GameObject spriteObj = bundle.LoadAsset<GameObject>("_Sprite");
+                    if (spriteObj != null)
+                    {
+                        Renderer renderer = spriteObj.GetComponent<Renderer>();
+                        if (renderer != null && renderer.material != null)
+                        {
+                            customMaterial = new Material(renderer.material);
+                            customMaterial.name = "FCSplash_CustomMaterial";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Error($"Error loading embedded asset bundle: {ex.Message}");
+            }
+            finally
+            {
+                bundle?.Unload(false);
+            }
+            
+            if (customMaterial != null)
+            {
+                imageView.material = customMaterial;
+            }
+            else
+            {
+                Material bloomSafeMaterial = new Material(imageView.material);
+                bloomSafeMaterial.name = "FCSplash_BloomSafe";
+                
+                if (bloomSafeMaterial.HasProperty("_SrcBlend"))
+                {
+                    bloomSafeMaterial.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                }
+                if (bloomSafeMaterial.HasProperty("_DstBlend"))
+                {
+                    bloomSafeMaterial.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                }
+                if (bloomSafeMaterial.HasProperty("_EmissionColor"))
+                {
+                    bloomSafeMaterial.SetColor("_EmissionColor", Color.black);
+                }
+                if (bloomSafeMaterial.HasProperty("_Emission"))
+                {
+                    bloomSafeMaterial.SetFloat("_Emission", 0f);
+                }
+                
+                imageView.material = bloomSafeMaterial;
+            }
+            
+            imageView.preserveAspect = true;
 
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
-            image.sprite = sprite;
+            imageView.sprite = sprite;
 
-            RectTransform imageRect = image.GetComponent<RectTransform>();
+            RectTransform imageRect = imageView.GetComponent<RectTransform>();
+            imageRect.anchorMin = new Vector2(0.5f, 0.5f);
+            imageRect.anchorMax = new Vector2(0.5f, 0.5f);
+            imageRect.pivot = new Vector2(0.5f, 0.5f);
             imageRect.sizeDelta = new Vector2(280, 280);
             imageRect.anchoredPosition = new Vector2(0, 100);
+            imageRect.localRotation = Quaternion.identity;
+            imageRect.localScale = Vector3.one;
 
             GameObject textObj = new GameObject("SplashText");
             textObj.transform.SetParent(containerObj.transform, false);
+            textObj.transform.localRotation = Quaternion.identity;
 
             TextMeshProUGUI textMesh = textObj.AddComponent<TextMeshProUGUI>();
             textMesh.text = "FULL COMBO";
@@ -150,6 +248,9 @@ public class FcSpawner : MonoBehaviour
             textMesh.enableWordWrapping = false;
 
             RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = new Vector2(0.5f, 0.5f);
+            textRect.anchorMax = new Vector2(0.5f, 0.5f);
+            textRect.pivot = new Vector2(0.5f, 0.5f);
             textRect.sizeDelta = new Vector2(700, 100);
             textRect.anchoredPosition = new Vector2(0, -90);
             
