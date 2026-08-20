@@ -6,7 +6,7 @@
 
 > **Adds a splash animation at the end if you FC a song with custom picture support.**
 
-[![Status](https://img.shields.io/badge/status-very%20early%20stages-orange)]()
+[![Status](https://img.shields.io/badge/status-beta-blue)]()
 
 </div>
 
