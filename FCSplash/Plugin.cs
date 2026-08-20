@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using IPA;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
