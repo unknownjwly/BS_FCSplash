@@ -32,4 +32,4 @@
 - [ ] Audio integration
 - [ ] Add fade transitions
 - [ ] Optional effects
-- [ ] Unload textures for RAM usage
+- [ x] Unload textures for RAM usage
