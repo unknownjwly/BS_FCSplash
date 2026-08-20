@@ -1,43 +1,47 @@
-﻿using System;
-using System.Linq;
+using System;
 using UnityEngine;
 using Zenject;
 
 namespace FCSplash;
 
-public class FcSpawnManager : IInitializable, IDisposable
+public class FcSpawnManager : IInitializable, IDisposable, ITickable
 {
+    [Inject] private readonly IComboController _comboController = null!;
+    [Inject] private readonly AudioTimeSyncController _audioTimeSyncController = null!;
     [Inject] private readonly BeatmapObjectManager _beatmapObjectManager = null!;
-    [Inject] private readonly IReadonlyBeatmapData _beatmapData = null!;
+    [Inject] private readonly GameplayCoreSceneSetupData _sceneSetupData = null!;
 
     private bool _isFullCombo = true;
-    private int _totalValidNotes = 0;
-    private int _processedNotes = 0;
     private bool _hasTriggeredFc = false;
+    private float _songDuration = 0f;
     private GameObject? _splashCanvasObj;
 
     public void Initialize()
     {
         _isFullCombo = true;
-        _processedNotes = 0;
         _hasTriggeredFc = false;
+        _songDuration = _sceneSetupData.beatmapLevel.songDuration;
         _splashCanvasObj = null;
 
-        _totalValidNotes = _beatmapData.GetBeatmapDataItems<NoteData>(0)
-            .Where(noteData => noteData.gameplayType != NoteData.GameplayType.Bomb)
-            .Count();
-
-        Plugin.Log.Info($"FcSpawnManager Initialized. Total valid notes: {_totalValidNotes}");
-
+        _comboController.comboBreakingEventHappenedEvent += OnComboBreak;
         _beatmapObjectManager.noteWasCutEvent += OnNoteWasCut;
         _beatmapObjectManager.noteWasMissedEvent += OnNoteWasMissed;
+        
+        Plugin.Log.Info($"FcSpawnManager Initialized. Song duration: {_songDuration}s");
     }
 
     public void Dispose()
     {
-        Plugin.Log.Info($"FcSpawnManager Disposed. Combo: {_processedNotes}/{_totalValidNotes}");
-        _beatmapObjectManager.noteWasCutEvent -= OnNoteWasCut;
-        _beatmapObjectManager.noteWasMissedEvent -= OnNoteWasMissed;
+        if (_comboController != null)
+        {
+            _comboController.comboBreakingEventHappenedEvent -= OnComboBreak;
+        }
+            
+        if (_beatmapObjectManager != null)
+        {
+            _beatmapObjectManager.noteWasCutEvent -= OnNoteWasCut;
+            _beatmapObjectManager.noteWasMissedEvent -= OnNoteWasMissed;
+        }
 
         if (_splashCanvasObj != null)
         {
@@ -45,53 +49,51 @@ public class FcSpawnManager : IInitializable, IDisposable
         }
     }
 
-    private void OnNoteWasCut(NoteController noteController, in NoteCutInfo noteCutInfo)
+    public void Tick()
     {
         if (_hasTriggeredFc) return;
 
-        NoteData noteData = noteController.noteData;
+        // Check if song has ended (with small buffer for audio fade)
+        float currentTime = _audioTimeSyncController.songTime;
+        if (currentTime >= _songDuration - 0.5f)
+        {
+            _hasTriggeredFc = true;
+            if (_isFullCombo)
+            {
+                _splashCanvasObj = FcSpawner.SpawnDisplay();
+                Plugin.Log.Info("Full Combo achieved! Triggering splash.");
+            }
+            else
+            {
+                Plugin.Log.Info("Song ended but Full Combo was lost.");
+            }
+        }
+    }
 
-        if (noteData.gameplayType == NoteData.GameplayType.Bomb)
+    private void OnComboBreak()
+    {
+        if (_isFullCombo)
         {
             _isFullCombo = false;
-            Plugin.Log.Info("FcSpawnManager: Full Combo lost - Hit a bomb!");
-            return;
+            Plugin.Log.Info("FcSpawnManager: Full Combo lost!");
         }
+    }
 
-        _processedNotes++;
-        if (!noteCutInfo.allIsOK)
+    private void OnNoteWasCut(NoteController noteController, in NoteCutInfo noteCutInfo)
+    {
+        // Bad cuts on colored notes break combo
+        if (!noteCutInfo.allIsOK && noteController.noteData.colorType != ColorType.None)
         {
             _isFullCombo = false;
-            Plugin.Log.Info("FcSpawnManager: Full Combo lost - Bad cut!");
         }
-
-        CheckCompletion();
     }
 
     private void OnNoteWasMissed(NoteController noteController)
     {
-        if (_hasTriggeredFc) return;
-
-        if (noteController.noteData.gameplayType != NoteData.GameplayType.Bomb)
+        // Missing any colored note breaks combo
+        if (noteController.noteData.colorType != ColorType.None)
         {
-            _processedNotes++;
             _isFullCombo = false;
-            Plugin.Log.Info("FcSpawnManager: Full Combo lost - Note missed!");
-        }
-
-        CheckCompletion();
-    }
-
-    private void CheckCompletion()
-    {
-        if (_processedNotes >= _totalValidNotes)
-        {
-            if (_isFullCombo && !_hasTriggeredFc)
-            {
-                _hasTriggeredFc = true;
-                // Call your separated spawner class here
-                _splashCanvasObj = FcSpawner.SpawnDisplay();
-            }
         }
     }
 }
