@@ -24,7 +24,7 @@ namespace FCSplash
         
         private static IEnumerator DelayedFinishRoutine(StandardLevelScenesTransitionSetupDataSO instance, LevelCompletionResults results)
         {
-            yield return new WaitForSeconds(1.25f);
+            yield return new WaitForSeconds(1.75f);
             
             _isWaiting = true;
             instance.Finish(results);
