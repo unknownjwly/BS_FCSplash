@@ -103,8 +103,7 @@ public class FcSpawner : MonoBehaviour
                 texture.SetPixels(greenPixels);
                 texture.Apply();
             }
-
-            // Procedurally round the corners by modifying texture pixels directly
+            
             try
             {
                 int w = texture.width;
@@ -139,7 +138,7 @@ public class FcSpawner : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Plugin.Log.Error($"Failed to apply procedural rounded corners: {ex.Message}");
+                Plugin.Log.Error($"Failed to apply rounded corners: {ex.Message}");
             }
 
             _activeCanvas = new GameObject("FcSplashCanvas");
@@ -173,8 +172,7 @@ public class FcSpawner : MonoBehaviour
 
             Image imageView = imageObj.AddComponent<Image>();
             imageView.color = Color.white;
-
-            // Load asset bundle material to prevent bloom bug
+            
             AssetBundle? bundle = null;
             try
             {
