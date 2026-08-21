@@ -1,11 +1,15 @@
-# BS_FCSplash
+<div align="center">
 
-<img width="800" height="450" alt="FCSplash 0 2 0" src="https://github.com/user-attachments/assets/fbb380b6-b813-47b0-a5aa-1f375c752cd4" />
+# FCSplash
 
-![status](https://img.shields.io/badge/status-beta-orange)
-![version](https://img.shields.io/badge/version-v0.2.0-blue)
+<p>
+  <img src="https://img.shields.io/badge/status-beta-orange" alt="Status Beta">
+  <img src="https://img.shields.io/badge/version-v0.2.0-blue" alt="Version 0.2.0">
+</p>
 
 Adds a splash animation at the end if you FC a song with custom picture support (now featuring procedural rounded corners!).
+
+</div>
 
 ---
 
