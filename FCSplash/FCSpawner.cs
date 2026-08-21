@@ -11,9 +11,9 @@ public class FcSpawner : MonoBehaviour
 {
     private static GameObject? _activeCanvas;
     private static Transform? _contentTransform;
-    
-    private static bool _isAnimating = false;
-    private static float _animTimer = 0f;
+
+    private static bool _isAnimating;
+    private static float _animTimer;
     private const float AnimDuration = 0.4f;
 
     private void Update()
@@ -58,7 +58,7 @@ public class FcSpawner : MonoBehaviour
             }
             else
             {
-                string[] supportedExtensions = { ".png", ".jpg", ".jpeg", ".webp" };
+                string[] supportedExtensions = [ ".png", ".jpg", ".jpeg", ".webp" ];
                 string[] files = Directory.GetFiles(folderPath);
 
                 foreach (string file in files)
@@ -85,7 +85,7 @@ public class FcSpawner : MonoBehaviour
                     texture.wrapMode = TextureWrapMode.Clamp;
                     texture.Apply(false, false);
                     
-                    if (texture.width > 2 && texture.height > 2)
+                    if (texture is { width: > 2, height: > 2 })
                     {
                         loadSuccess = true;
                     }
@@ -104,6 +104,44 @@ public class FcSpawner : MonoBehaviour
                 texture.Apply();
             }
 
+            // Procedurally round the corners by modifying texture pixels directly
+            try
+            {
+                int w = texture.width;
+                int h = texture.height;
+                float radius = Mathf.Min(w, h) * 0.12f;
+                Color32[] pixels = texture.GetPixels32();
+
+                for (int y = 0; y < h; y++)
+                {
+                    for (int x = 0; x < w; x++)
+                    {
+                        bool isTopLeft = x < radius && y > h - radius;
+                        bool isTopRight = x > w - radius && y > h - radius;
+                        bool isBottomLeft = x < radius && y < radius;
+                        bool isBottomRight = x > w - radius && y < radius;
+
+                        if (isTopLeft || isTopRight || isBottomLeft || isBottomRight)
+                        {
+                            float dx = x < radius ? radius - x : x - (w - radius);
+                            float dy = y < radius ? radius - y : y - (h - radius);
+                            if (dx * dx + dy * dy > radius * radius)
+                            {
+                                int index = y * w + x;
+                                pixels[index] = new Color32(0, 0, 0, 0);
+                            }
+                        }
+                    }
+                }
+
+                texture.SetPixels32(pixels);
+                texture.Apply(false, false);
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Error($"Failed to apply procedural rounded corners: {ex.Message}");
+            }
+
             _activeCanvas = new GameObject("FcSplashCanvas");
             _activeCanvas.AddComponent<FcSpawner>();
             
@@ -114,7 +152,7 @@ public class FcSpawner : MonoBehaviour
             CanvasScaler canvasScaler = _activeCanvas.AddComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             
-            GraphicRaycaster raycaster = _activeCanvas.AddComponent<GraphicRaycaster>();
+            _activeCanvas.AddComponent<GraphicRaycaster>();
             
             _activeCanvas.transform.position = new Vector3(0f, 1.45f, 5.5f);
             _activeCanvas.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
@@ -135,34 +173,24 @@ public class FcSpawner : MonoBehaviour
 
             Image imageView = imageObj.AddComponent<Image>();
             imageView.color = Color.white;
-            
-            Material? customMaterial = null;
+
+            // Load asset bundle material to prevent bloom bug
             AssetBundle? bundle = null;
-            
             try
             {
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                string? resourceName = null;
-                
                 foreach (string name in assembly.GetManifestResourceNames())
                 {
                     if (name.EndsWith("sprite.assetbundle", StringComparison.OrdinalIgnoreCase))
                     {
-                        resourceName = name;
-                        break;
-                    }
-                }
-                
-                if (resourceName != null)
-                {
-                    using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                    {
+                        using Stream? stream = assembly.GetManifestResourceStream(name);
                         if (stream != null)
                         {
-                            byte[] bundleData = new byte[stream.Length];
-                            stream.Read(bundleData, 0, bundleData.Length);
-                            bundle = AssetBundle.LoadFromMemory(bundleData);
+                            using MemoryStream ms = new MemoryStream();
+                            stream.CopyTo(ms);
+                            bundle = AssetBundle.LoadFromMemory(ms.ToArray());
                         }
+                        break;
                     }
                 }
 
@@ -172,30 +200,24 @@ public class FcSpawner : MonoBehaviour
                     if (spriteObj != null)
                     {
                         Renderer renderer = spriteObj.GetComponent<Renderer>();
-                        if (renderer != null && renderer.material != null)
+                        if (renderer != null && renderer.sharedMaterial != null)
                         {
-                            customMaterial = new Material(renderer.material);
-                            customMaterial.name = "FCSplash_CustomMaterial";
+                            imageView.material = new Material(renderer.sharedMaterial);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Plugin.Log.Error($"Error loading embedded asset bundle: {ex.Message}");
+                Plugin.Log.Error($"Error loading asset bundle material: {ex.Message}");
             }
             finally
             {
                 bundle?.Unload(false);
             }
             
-            if (customMaterial != null)
-            {
-                imageView.material = customMaterial;
-            }
-            
             imageView.preserveAspect = true;
-
+            
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
             imageView.sprite = sprite;
 
@@ -204,7 +226,7 @@ public class FcSpawner : MonoBehaviour
             imageRect.anchorMax = new Vector2(0.5f, 0.5f);
             imageRect.pivot = new Vector2(0.5f, 0.5f);
             imageRect.sizeDelta = new Vector2(280, 280);
-            imageRect.anchoredPosition = new Vector2(0, 100);
+            imageRect.anchoredPosition = new Vector2(0, 50);
             imageRect.localRotation = Quaternion.identity;
             imageRect.localScale = Vector3.one;
 
@@ -233,7 +255,7 @@ public class FcSpawner : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Plugin.Log.Error($"Failed to spawn splash display: {ex}");
+            Plugin.Log.Error($"Failed to spawn splash display: {ex.Message}\n{ex.StackTrace}");
             return null;
         }
     }
