@@ -1,7 +1,8 @@
+
 <div align="center">
 
 # FCSplash
-
+<img width="800" height="450" alt="FCSplash 0 2 0" src="https://github.com/user-attachments/assets/ddf81df5-bd74-4e8c-baca-b3ebec493c28" />
 <p>
   <img src="https://img.shields.io/badge/status-beta-orange" alt="Status Beta">
   <img src="https://img.shields.io/badge/version-v0.2.0-blue" alt="Version 0.2.0">
