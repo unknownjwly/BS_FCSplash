@@ -29,7 +29,7 @@ public class FcSpawnManager : IInitializable, IDisposable
             .Where(noteData => noteData.gameplayType != NoteData.GameplayType.Bomb)
             .Count();
 
-        Plugin.Log.Info($"FcSpawnManager Initialized. Total valid notes: {_totalValidNotes}");
+        Plugin.Log.Info($"FcSpawnManager Initialized. Total notes: {_totalValidNotes}");
         
         CoroutineHost.Start(PreloadSplashRoutine());
 
@@ -39,7 +39,7 @@ public class FcSpawnManager : IInitializable, IDisposable
 
     public void Dispose()
     {
-        Plugin.Log.Info($"FcSpawnManager Disposed. Combo: {_processedNotes}/{_totalValidNotes}");
+        Plugin.Log.Info($"FcSpawnManager deinitialized. Combo: {_processedNotes}/{_totalValidNotes}");
         _beatmapObjectManager.noteWasCutEvent -= OnNoteWasCut;
         _beatmapObjectManager.noteWasMissedEvent -= OnNoteWasMissed;
 
@@ -103,7 +103,7 @@ public class FcSpawnManager : IInitializable, IDisposable
             if (_isFullCombo && !_hasTriggeredFc)
             {
                 _hasTriggeredFc = true;
-                Plugin.Log.Info("FcSpawnManager: Full Combo achieved! Activating splash display.");
+                Plugin.Log.Info("FcSpawnManager: Full Combo'd!");
                 
                 if (_splashCanvasObj != null)
                 {
