@@ -1,14 +1,11 @@
-<div align="center">
-
-<img width="800" height="450" alt="ezgif-67f359514615fd70" src="https://github.com/user-attachments/assets/9f39373c-95fc-4166-a736-fd4ab66e7ab1" />
-
 # BS_FCSplash
 
-> **Adds a splash animation at the end if you FC a song with custom picture support.**
+<img width="800" height="450" alt="FCSplash 0 2 0" src="https://github.com/user-attachments/assets/fbb380b6-b813-47b0-a5aa-1f375c752cd4" />
 
-[![Status](https://img.shields.io/badge/status-beta-blue)]()
+![status](https://img.shields.io/badge/status-beta-orange)
+![version](https://img.shields.io/badge/version-v0.2.0-blue)
 
-</div>
+Adds a splash animation at the end if you FC a song with custom picture support (now featuring procedural rounded corners!).
 
 ---
 
@@ -33,3 +30,4 @@
 - [ ] Add fade transitions
 - [ ] Optional effects
 - [x] Unload textures for RAM usage
+- [x] Rounded corners for images
