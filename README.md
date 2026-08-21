@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/version-v0.2.0-blue" alt="Version 0.2.0">
 </p>
 
-Adds a splash animation at the end if you FC a song with custom picture support (now featuring procedural rounded corners!).
+A Beat Saber mod that adds a splash animation at the end if you FC a song with custom picture support (now featuring procedural rounded corners!).
 
 </div>
 
