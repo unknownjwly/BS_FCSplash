@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- This file contains project properties used by the build. -->
 <Project>
 
@@ -7,9 +7,9 @@
     <PluginId>FCSplash</PluginId>
     <PluginName>FCSplash</PluginName>
     <Authors>zjavierf</Authors>
-    <Version>0.0.1</Version>
+    <Version>0.2.0</Version>
     <GameVersion>1.40.8</GameVersion>
-    <Description>Shows an animation when you FC</Description>
+    <Description>Shows a splash animation when you FC</Description>
     <!--<PluginIcon></PluginIcon>-->
     <!--<ProjectSource></ProjectSource>-->
     <!--<ProjectHome></ProjectHome>-->
