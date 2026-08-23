@@ -16,8 +16,10 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 
 ## Usage
 
-1. Create a folder named `FCSplash` inside your `UserData` directory.
-2. Place any single image you want to use as your splash screen inside that folder.
+1. Launch Beat Saber with Mod installed.
+2. Place 1 or more images in "UserData/FCSplash/Images & Gifs"
+3. [OPTIONAL] Add your own custom sound effect to play when the FCSplash appears
+4. Configure your settings in UserData/FCSplash.json
 3. Full Combo (FC) a song.
 
 ---
