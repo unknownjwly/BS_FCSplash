@@ -38,6 +38,14 @@
         <Reference Include="BeatSaber.BeatmapEditor">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BeatSaber.BeatmapEditor.dll</HintPath>
         </Reference>
+        <Reference Include="BeatSaber.Init">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.Init.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BeatSaber.TrackDefinitions">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.TrackDefinitions.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="BeatSaber.ViewSystem">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
             <Private>false</Private>
@@ -48,11 +56,35 @@
         <Reference Include="BGLib.Attributes">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGLib.Attributes.dll</HintPath>
         </Reference>
+        <Reference Include="BGLib.ClassicStaticBatcher">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.ClassicStaticBatcher.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="BGLib.DotnetExtension">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGLib.DotnetExtension.dll</HintPath>
         </Reference>
+        <Reference Include="BGLib.FileStorage">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.FileStorage.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BGLib.FileStorage.Sony">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.FileStorage.Sony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BGLib.JsonExtension">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.JsonExtension.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="BGLib.MetaRemoteAssets">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGLib.MetaRemoteAssets.dll</HintPath>
+        </Reference>
+        <Reference Include="BGLib.Notepad">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.Notepad.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BGLib.Polyglot">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.Polyglot.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="BGLib.UiToolkitUtilities">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.UiToolkitUtilities.dll</HintPath>
@@ -64,14 +96,18 @@
         <Reference Include="BGNetCore">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGNetCore.dll</HintPath>
         </Reference>
+        <Reference Include="BGNetLogging">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNetLogging.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BS_Utils">
+          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Plugins\BS_Utils.dll</HintPath>
+        </Reference>
         <Reference Include="BSAssetLib">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Plugins\BSAssetLib.dll</HintPath>
         </Reference>
         <Reference Include="BSML">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Plugins\BSML.dll</HintPath>
-        </Reference>
-        <Reference Include="BS_Utils">
-          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Plugins\BS_Utils.dll</HintPath>
         </Reference>
         <Reference Include="CatCore">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Libs\CatCore.dll</HintPath>
@@ -82,8 +118,16 @@
         <Reference Include="DataModels">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\DataModels.dll</HintPath>
         </Reference>
+        <Reference Include="GameInit">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameInit.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="GameplayCore">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
+        </Reference>
+        <Reference Include="Helpers">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Helpers.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Hive.Versioning">
             <HintPath>$(BeatSaberDir)\Libs\Hive.Versioning.dll</HintPath>
@@ -99,6 +143,10 @@
         <Reference Include="HMUI">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMUI.dll</HintPath>
         </Reference>
+        <Reference Include="Interactable">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Interactable.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="IPA.Loader">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
             <Private>false</Private>
@@ -107,8 +155,20 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="MediaLoader">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\MediaLoader.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Microsoft.CSharp">
+            <HintPath>$(BeatSaberDir)\Libs\Microsoft.CSharp.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="MockCore">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\MockCore.dll</HintPath>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+            <HintPath>$(BeatSaberDir)\Libs\Mono.Cecil.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="MonoMod.Core">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Libs\MonoMod.Core.dll</HintPath>
@@ -117,6 +177,10 @@
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Libs\MonoMod.Utils.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib" />
+        <Reference Include="mscorlib">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\mscorlib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="netstandard" />
         <Reference Include="netstandard">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\netstandard.dll</HintPath>
@@ -132,14 +196,39 @@
         <Reference Include="SegmentedControl">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\SegmentedControl.dll</HintPath>
         </Reference>
+        <Reference Include="SemVer">
+            <HintPath>$(BeatSaberDir)\Libs\SemVer.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="SiraUtil">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Plugins\SiraUtil.dll</HintPath>
         </Reference>
         <Reference Include="SixLabors.ImageSharp">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Libs\SixLabors.ImageSharp.dll</HintPath>
         </Reference>
+        <Reference Include="SongCore">
+            <HintPath>$(BeatSaberDir)\Plugins\SongCore.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="SongDetailsCache">
+            <HintPath>$(BeatSaberDir)\Plugins\SongDetailsCache.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="System" />
+        <Reference Include="System">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="System.Configuration" />
+        <Reference Include="System.Configuration">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.Configuration.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="System.Core" />
+        <Reference Include="System.Core">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.Core.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="System.Data">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.Data.dll</HintPath>
             <Private>false</Private>
@@ -179,6 +268,9 @@
         <Reference Include="UnityEngine.AssetBundleModule">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.AudioModule">
+          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
             <Private>false</Private>
@@ -196,8 +288,14 @@
         <Reference Include="UnityEngine.InputModule">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.InputModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ParticleSystemModule">
+          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.ScreenCaptureModule">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.ScreenCaptureModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.SharedInternalsModule">
+          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.SharedInternalsModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.SpriteMaskModule">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.SpriteMaskModule.dll</HintPath>
@@ -232,6 +330,16 @@
         <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestModule">
+          <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="UnityEngine.VirtualTexturingModule">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.VirtualTexturingModule.dll</HintPath>
         </Reference>
@@ -240,6 +348,10 @@
         </Reference>
         <Reference Include="VRUI">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\VRUI.dll</HintPath>
+        </Reference>
+        <Reference Include="VRUI.Interfaces">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\VRUI.Interfaces.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="Zenject">
           <HintPath>..\..\..\..\..\..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\Zenject.dll</HintPath>
@@ -253,11 +365,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Resource\sprite.assetbundle" />
+      <None Remove="Resources\NoImageFound.png" />
+      <EmbeddedResource Include="Resources\NoImageFound.png" />
+      <None Remove="Resources\sprite.assetbundle" />
+      <EmbeddedResource Include="Resources\sprite.assetbundle" />
+      <None Remove="Resources\tick.wav" />
+      <EmbeddedResource Include="Resources\tick.wav" />
     </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="sprite.assetbundle" />
-    </ItemGroup>
 
 </Project>
