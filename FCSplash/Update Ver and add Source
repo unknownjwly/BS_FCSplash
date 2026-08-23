@@ -7,11 +7,11 @@
     <PluginId>FCSplash</PluginId>
     <PluginName>FCSplash</PluginName>
     <Authors>zjavierf</Authors>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <GameVersion>1.40.8</GameVersion>
     <Description>Shows a splash animation when you FC</Description>
     <!--<PluginIcon></PluginIcon>-->
-    <!--<ProjectSource></ProjectSource>-->
+    <!--<ProjectSource>https://github.com/unknownjwly/BS_FCSplash</ProjectSource>-->
     <!--<ProjectHome></ProjectHome>-->
     <!--<DonateUrl></DonateUrl>-->
   </PropertyGroup>
