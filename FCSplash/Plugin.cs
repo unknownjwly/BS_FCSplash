@@ -1,5 +1,7 @@
+using System.IO;
 using HarmonyLib;
 using IPA;
+using IPA.Utilities;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
 
@@ -19,8 +21,22 @@ public class Plugin
         Instance = this;
         Log = logger;
 
+        Config.Load();
+        CreateRequiredFolders();
+
         zenjector.UseLogger(logger);
         zenjector.Install<FcSpawnInstaller>(Location.Player);
+    }
+
+    private void CreateRequiredFolders()
+    {
+        string userDataPath = UnityGame.UserDataPath;
+        string modFolder = Path.Combine(userDataPath, "FCSplash");
+        string imagesFolder = Path.Combine(modFolder, "Images & Gifs");
+        string soundsFolder = Path.Combine(modFolder, "Sounds");
+        
+        Directory.CreateDirectory(imagesFolder);
+        Directory.CreateDirectory(soundsFolder);
     }
 
     [OnEnable]
