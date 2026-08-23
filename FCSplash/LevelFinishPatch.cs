@@ -1,34 +1,36 @@
 using System.Collections;
+using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
 namespace FCSplash
 {
-    [HarmonyPatch(typeof(StandardLevelScenesTransitionSetupDataSO), nameof(StandardLevelScenesTransitionSetupDataSO.Finish))]
+    [HarmonyPatch(typeof(StandardLevelFinishedController), "StartLevelFinished")]
     public class LevelFinishPatch
     {
-        private static bool _isWaiting = false;
+        private static bool _isDelayedRunning = false;
+        
+        private static readonly MethodInfo StartLevelFinishedMethod = 
+            AccessTools.Method(typeof(StandardLevelFinishedController), "StartLevelFinished");
 
-        public static bool Prefix(StandardLevelScenesTransitionSetupDataSO __instance, LevelCompletionResults levelCompletionResults)
+        public static bool Prefix(StandardLevelFinishedController __instance)
         {
-            if (_isWaiting) return true;
-
-            if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Cleared)
+            if (_isDelayedRunning)
             {
-                CoroutineHost.Start(DelayedFinishRoutine(__instance, levelCompletionResults));
-                return false; 
+                return true; 
             }
 
-            return true;
+            CoroutineHost.Start(DelayedLevelFinishRoutine(__instance));
+            return false;
         }
-        
-        private static IEnumerator DelayedFinishRoutine(StandardLevelScenesTransitionSetupDataSO instance, LevelCompletionResults results)
+
+        private static IEnumerator DelayedLevelFinishRoutine(StandardLevelFinishedController instance)
         {
-            yield return new WaitForSeconds(1.75f);
-            
-            _isWaiting = true;
-            instance.Finish(results);
-            _isWaiting = false;
+            yield return new WaitForSeconds(Config.Instance.General.LevelFinishDelay);
+
+            _isDelayedRunning = true;
+            StartLevelFinishedMethod.Invoke(instance, null);
+            _isDelayedRunning = false;
         }
     }
 }
