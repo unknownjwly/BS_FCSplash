@@ -28,10 +28,21 @@ public class GifAnimator : MonoBehaviour
         {
             _targetImage.sprite = _frames[0];
         }
+
+        if (_frames.Count > 1 && _animationRoutine == null && enabled)
+        {
+            _animationRoutine = StartCoroutine(PlayAnimation());
+        }
     }
 
     private void OnEnable()
     {
+        _currentIndex = 0;
+        if (_frames.Count > 0 && _targetImage != null)
+        {
+            _targetImage.sprite = _frames[0];
+        }
+
         if (_frames.Count > 1 && _animationRoutine == null)
         {
             _animationRoutine = StartCoroutine(PlayAnimation());
@@ -70,8 +81,260 @@ public class FcSpawner : MonoBehaviour
     private static GameObject? _activeCanvas;
     private static Transform? _contentTransform;
 
-    private static bool _isAnimating;
-    private static float _animTimer;
+    private bool _isAnimating;
+    private float _animTimer;
+
+    // Cache containers so disk I/O and pixel processing happen only once on song load
+    private static List<Sprite>? _cachedSprites;
+    private static List<float>? _cachedDelays;
+    private static Material? _cachedMaterial;
+
+    public static void PreloadAssets()
+    {
+        if (_cachedSprites != null && _cachedSprites.Count > 0) return;
+
+        _cachedSprites = new List<Sprite>();
+        _cachedDelays = new List<float>();
+
+        try
+        {
+            string folderPath = Path.Combine(UnityGame.UserDataPath, "FCSplash", "Images & Gifs");
+            string? imagePath = null;
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            else
+            {
+                string[] supportedExtensions = [ 
+                    ".gif", ".jfi", ".jfif", ".jif", ".jpe", ".jpeg", ".jpg", ".png", ".webp" 
+                ];
+                
+                string[] files = Directory.GetFiles(folderPath);
+                List<string> validImageFiles = new List<string>();
+
+                foreach (string file in files)
+                {
+                    string ext = Path.GetExtension(file).ToLowerInvariant();
+                    if (Array.Exists(supportedExtensions, e => e == ext))
+                    {
+                        validImageFiles.Add(file);
+                    }
+                }
+
+                if (validImageFiles.Count > 0)
+                {
+                    if (Config.Instance.General.EnableRandomImage)
+                    {
+                        var randomizedFiles = validImageFiles.OrderBy(_ => Guid.NewGuid()).ToList();
+                        imagePath = randomizedFiles[0];
+                    }
+                    else
+                    {
+                        imagePath = validImageFiles[0];
+                    }
+                }
+            }
+
+            List<Texture2D> texturesToProcess = new List<Texture2D>();
+
+            if (imagePath != null && File.Exists(imagePath))
+            {
+                byte[] fileData = File.ReadAllBytes(imagePath);
+                string ext = Path.GetExtension(imagePath).ToLowerInvariant();
+
+                if (ext == ".gif")
+                {
+                    try
+                    {
+                        using (MemoryStream ms = new MemoryStream(fileData))
+                        using (BinaryReader br = new BinaryReader(ms))
+                        {
+                            var gifFrames = SimpleGifDecoder.Decode(br);
+                            foreach (var frameData in gifFrames)
+                            {
+                                Texture2D tex = new Texture2D(frameData.Width, frameData.Height, TextureFormat.RGBA32, false);
+                                tex.SetPixels32(frameData.Pixels);
+                                tex.Apply(false, false);
+                                tex.filterMode = FilterMode.Bilinear;
+                                tex.wrapMode = TextureWrapMode.Clamp;
+                                
+                                texturesToProcess.Add(tex);
+                                _cachedDelays.Add(frameData.Delay);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Plugin.Log.Error($"[FcSpawner] Failed to parse GIF file: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Texture2D tempTex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                    if (tempTex.LoadImage(fileData))
+                    {
+                        Texture2D singleTex = new Texture2D(tempTex.width, tempTex.height, TextureFormat.RGBA32, false);
+                        singleTex.SetPixels32(tempTex.GetPixels32());
+                        singleTex.Apply(false, false);
+                        UnityEngine.Object.Destroy(tempTex);
+
+                        singleTex.filterMode = FilterMode.Bilinear;
+                        singleTex.wrapMode = TextureWrapMode.Clamp;
+                        
+                        texturesToProcess.Add(singleTex);
+                        _cachedDelays.Add(1f);
+                    }
+                }
+            }
+
+            if (texturesToProcess.Count == 0)
+            {
+                try
+                {
+                    var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                    string resourceName = "FCSplash.Resources.NoImageFound.png";
+
+                    using (Stream? stream = assembly.GetManifestResourceStream(resourceName))
+                    {
+                        if (stream != null)
+                        {
+                            byte[] fileData = new byte[stream.Length];
+                            stream.Read(fileData, 0, fileData.Length);
+
+                            Texture2D tempTex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                            if (tempTex.LoadImage(fileData))
+                            {
+                                Texture2D fallbackTex = new Texture2D(tempTex.width, tempTex.height, TextureFormat.RGBA32, false);
+                                fallbackTex.SetPixels32(tempTex.GetPixels32());
+                                fallbackTex.Apply(false, false);
+                                UnityEngine.Object.Destroy(tempTex);
+
+                                fallbackTex.filterMode = FilterMode.Bilinear;
+                                fallbackTex.wrapMode = TextureWrapMode.Clamp;
+
+                                texturesToProcess.Add(fallbackTex);
+                                _cachedDelays.Add(1f);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Log.Error($"[FcSpawner] Failed to load embedded fallback image: {ex.Message}");
+                }
+            }
+
+            foreach (var tex in texturesToProcess)
+            {
+                try
+                {
+                    int width = tex.width;
+                    int height = tex.height;
+                    Color32[] pixels = tex.GetPixels32();
+
+                    if (Config.Instance.General.EnableRoundCorners)
+                    {
+                        float radius = Mathf.Min(width, height) * 0.12f;
+
+                        for (int y = 0; y < height; y++)
+                        {
+                            for (int x = 0; x < width; x++)
+                            {
+                                float cx = x < radius ? radius : (x > width - radius ? width - radius : -1f);
+                                float cy = y < radius ? radius : (y > height - radius ? height - radius : -1f);
+
+                                if (cx != -1f && cy != -1f)
+                                {
+                                    float dx = x - cx;
+                                    float dy = y - cy;
+                                    float distance = Mathf.Sqrt(dx * dx + dy * dy);
+
+                                    if (distance > radius)
+                                    {
+                                        int index = y * width + x;
+                                        Color32 original = pixels[index];
+                                        float alphaFactor = Mathf.Clamp01((radius + 1f - distance) / 1f);
+                                        original.a = (byte)(original.a * alphaFactor);
+                                        pixels[index] = original;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    tex.SetPixels32(pixels);
+                    tex.Apply(false, false);
+                    
+                    _cachedSprites.Add(Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 100f));
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Log.Error($"[FcSpawner] Failed to apply rounding logic to frame: {ex.Message}");
+                }
+            }
+
+            // Cache AssetBundle material
+            AssetBundle? bundle = null;
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                foreach (string name in assembly.GetManifestResourceNames())
+                {
+                    if (name.EndsWith("sprite.assetbundle", StringComparison.OrdinalIgnoreCase))
+                    {
+                        using Stream? stream = assembly.GetManifestResourceStream(name);
+                        if (stream != null)
+                        {
+                            using MemoryStream ms = new MemoryStream();
+                            stream.CopyTo(ms);
+                            bundle = AssetBundle.LoadFromMemory(ms.ToArray());
+                        }
+                        break;
+                    }
+                }
+
+                if (bundle != null)
+                {
+                    GameObject spriteObj = bundle.LoadAsset<GameObject>("_Sprite");
+                    if (spriteObj != null)
+                    {
+                        Renderer renderer = spriteObj.GetComponent<Renderer>();
+                        if (renderer != null && renderer.sharedMaterial != null)
+                        {
+                            _cachedMaterial = new Material(renderer.sharedMaterial);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Error($"[FcSpawner] Error loading asset bundle material: {ex.Message}");
+            }
+            finally
+            {
+                bundle?.Unload(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Plugin.Log.Error($"[FcSpawner] Failed to preload assets: {ex.Message}");
+        }
+    }
+
+    public static void ClearCache()
+    {
+        _cachedSprites = null;
+        _cachedDelays = null;
+        _cachedMaterial = null;
+    }
+
+    private void Start()
+    {
+        _animTimer = 0f;
+        _isAnimating = true;
+    }
 
     private void Update()
     {
@@ -142,188 +405,9 @@ public class FcSpawner : MonoBehaviour
 
         try
         {
-            string folderPath = Path.Combine(UnityGame.UserDataPath, "FCSplash", "Images & Gifs");
-            string? imagePath = null;
-
-            if (!Directory.Exists(folderPath))
+            if (_cachedSprites == null || _cachedSprites.Count == 0)
             {
-                Directory.CreateDirectory(folderPath);
-            }
-            else
-            {
-                string[] supportedExtensions = [ 
-                    ".gif", ".jfi", ".jfif", ".jif", ".jpe", ".jpeg", ".jpg", ".png", ".webp" 
-                ];
-                
-                string[] files = Directory.GetFiles(folderPath);
-                List<string> validImageFiles = new List<string>();
-
-                foreach (string file in files)
-                {
-                    string ext = Path.GetExtension(file).ToLowerInvariant();
-                    if (Array.Exists(supportedExtensions, e => e == ext))
-                    {
-                        validImageFiles.Add(file);
-                    }
-                }
-
-                if (validImageFiles.Count > 0)
-                {
-                    if (Config.Instance.General.EnableRandomImage)
-                    {
-                        var randomizedFiles = validImageFiles.OrderBy(_ => Guid.NewGuid()).ToList();
-                        imagePath = randomizedFiles[0];
-                    }
-                    else
-                    {
-                        imagePath = validImageFiles[0];
-                    }
-                }
-            }
-
-            List<Texture2D> texturesToProcess = new List<Texture2D>();
-            List<float> frameDelays = new List<float>();
-
-            if (imagePath != null && File.Exists(imagePath))
-            {
-                byte[] fileData = File.ReadAllBytes(imagePath);
-                string ext = Path.GetExtension(imagePath).ToLowerInvariant();
-
-                if (ext == ".gif")
-                {
-                    try
-                    {
-                        using (MemoryStream ms = new MemoryStream(fileData))
-                        using (BinaryReader br = new BinaryReader(ms))
-                        {
-                            var gifFrames = SimpleGifDecoder.Decode(br);
-                            foreach (var frameData in gifFrames)
-                            {
-                                Texture2D tex = new Texture2D(frameData.Width, frameData.Height, TextureFormat.RGBA32, false);
-                                tex.SetPixels32(frameData.Pixels);
-                                tex.Apply(false, false);
-                                tex.filterMode = FilterMode.Bilinear;
-                                tex.wrapMode = TextureWrapMode.Clamp;
-                                
-                                texturesToProcess.Add(tex);
-                                frameDelays.Add(frameData.Delay);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Plugin.Log.Error($"[FcSpawner] Failed to parse GIF file: {ex.Message}");
-                    }
-                }
-                else
-                {
-                    Texture2D tempTex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                    if (tempTex.LoadImage(fileData))
-                    {
-                        Texture2D singleTex = new Texture2D(tempTex.width, tempTex.height, TextureFormat.RGBA32, false);
-                        singleTex.SetPixels32(tempTex.GetPixels32());
-                        singleTex.Apply(false, false);
-                        UnityEngine.Object.Destroy(tempTex);
-
-                        singleTex.filterMode = FilterMode.Bilinear;
-                        singleTex.wrapMode = TextureWrapMode.Clamp;
-                        
-                        texturesToProcess.Add(singleTex);
-                        frameDelays.Add(1f);
-                    }
-                }
-            }
-
-            if (texturesToProcess.Count == 0)
-            {
-                try
-                {
-                    var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                    string resourceName = "FCSplash.Resources.NoImageFound.png";
-
-                    using (Stream? stream = assembly.GetManifestResourceStream(resourceName))
-                    {
-                        if (stream != null)
-                        {
-                            byte[] fileData = new byte[stream.Length];
-                            stream.Read(fileData, 0, fileData.Length);
-
-                            Texture2D tempTex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                            if (tempTex.LoadImage(fileData))
-                            {
-                                Texture2D fallbackTex = new Texture2D(tempTex.width, tempTex.height, TextureFormat.RGBA32, false);
-                                fallbackTex.SetPixels32(tempTex.GetPixels32());
-                                fallbackTex.Apply(false, false);
-                                UnityEngine.Object.Destroy(tempTex);
-
-                                fallbackTex.filterMode = FilterMode.Bilinear;
-                                fallbackTex.wrapMode = TextureWrapMode.Clamp;
-
-                                texturesToProcess.Add(fallbackTex);
-                                frameDelays.Add(1f);
-                            }
-                        }
-                        else
-                        {
-                            Plugin.Log.Error($"[FcSpawner] Could not find embedded resource: {resourceName}");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Plugin.Log.Error($"[FcSpawner] Failed to load embedded fallback image: {ex.Message}");
-                }
-            }
-
-            List<Sprite> generatedSprites = new List<Sprite>();
-
-            foreach (var tex in texturesToProcess)
-            {
-                try
-                {
-                    int width = tex.width;
-                    int height = tex.height;
-                    Color32[] pixels = tex.GetPixels32();
-
-                    if (Config.Instance.General.EnableRoundCorners)
-                    {
-                        float radius = Mathf.Min(width, height) * 0.12f;
-
-                        for (int y = 0; y < height; y++)
-                        {
-                            for (int x = 0; x < width; x++)
-                            {
-                                float cx = x < radius ? radius : (x > width - radius ? width - radius : -1f);
-                                float cy = y < radius ? radius : (y > height - radius ? height - radius : -1f);
-
-                                if (cx != -1f && cy != -1f)
-                                {
-                                    float dx = x - cx;
-                                    float dy = y - cy;
-                                    float distance = Mathf.Sqrt(dx * dx + dy * dy);
-
-                                    if (distance > radius)
-                                    {
-                                        int index = y * width + x;
-                                        Color32 original = pixels[index];
-                                        float alphaFactor = Mathf.Clamp01((radius + 1f - distance) / 1f);
-                                        original.a = (byte)(original.a * alphaFactor);
-                                        pixels[index] = original;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    tex.SetPixels32(pixels);
-                    tex.Apply(false, false);
-                    
-                    generatedSprites.Add(Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 100f));
-                }
-                catch (Exception ex)
-                {
-                    Plugin.Log.Error($"[FcSpawner] Failed to apply rounding logic to frame: {ex.Message}");
-                }
+                PreloadAssets();
             }
 
             _activeCanvas = new GameObject("FcSplashCanvas");
@@ -347,9 +431,6 @@ public class FcSpawner : MonoBehaviour
             containerObj.transform.localRotation = Quaternion.identity;
             _contentTransform = containerObj.transform;
             _contentTransform.localScale = Vector3.zero;
-            
-            _animTimer = 0f;
-            _isAnimating = true;
             
             RectTransform textParentRect = null!;
             if (Config.Instance.Text.EnableText)
@@ -421,58 +502,22 @@ public class FcSpawner : MonoBehaviour
             Image imageView = imageObj.AddComponent<Image>();
             imageView.color = Color.white;
             
-            AssetBundle? bundle = null;
-            try
+            if (_cachedMaterial != null)
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                foreach (string name in assembly.GetManifestResourceNames())
-                {
-                    if (name.EndsWith("sprite.assetbundle", StringComparison.OrdinalIgnoreCase))
-                    {
-                        using Stream? stream = assembly.GetManifestResourceStream(name);
-                        if (stream != null)
-                        {
-                            using MemoryStream ms = new MemoryStream();
-                            stream.CopyTo(ms);
-                            bundle = AssetBundle.LoadFromMemory(ms.ToArray());
-                        }
-                        break;
-                    }
-                }
-
-                if (bundle != null)
-                {
-                    GameObject spriteObj = bundle.LoadAsset<GameObject>("_Sprite");
-                    if (spriteObj != null)
-                    {
-                        Renderer renderer = spriteObj.GetComponent<Renderer>();
-                        if (renderer != null && renderer.sharedMaterial != null)
-                        {
-                            imageView.material = new Material(renderer.sharedMaterial);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Plugin.Log.Error($"[FcSpawner] Error loading asset bundle material: {ex.Message}");
-            }
-            finally
-            {
-                bundle?.Unload(false);
+                imageView.material = new Material(_cachedMaterial);
             }
             
             imageView.preserveAspect = true;
             
-            if (generatedSprites.Count > 0)
+            if (_cachedSprites != null && _cachedSprites.Count > 0)
             {
-                imageView.sprite = generatedSprites[0];
-            }
+                imageView.sprite = _cachedSprites[0];
 
-            if (generatedSprites.Count > 1)
-            {
-                GifAnimator animator = imageObj.AddComponent<GifAnimator>();
-                animator.Initialize(generatedSprites, frameDelays, imageView);
+                if (_cachedSprites.Count > 1 && _cachedDelays != null)
+                {
+                    GifAnimator animator = imageObj.AddComponent<GifAnimator>();
+                    animator.Initialize(_cachedSprites, _cachedDelays, imageView);
+                }
             }
             
             RectTransform imageRect = imageView.GetComponent<RectTransform>();
