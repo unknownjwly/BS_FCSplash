@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -44,7 +45,8 @@ public class FcSpawnManager : IInitializable, IDisposable
             CoroutineHost.Start(LoadAudioClipRoutine());
         }
 
-        CoroutineHost.Start(PreloadSplashRoutine());
+        // Preload and cache all image/GIF textures in the background so the final note hit has zero disk/decode lag
+        FcSpawner.PreloadAssets();
 
         _beatmapObjectManager.noteWasCutEvent += OnNoteWasCut;
         _beatmapObjectManager.noteWasMissedEvent += OnNoteWasMissed;
@@ -65,6 +67,8 @@ public class FcSpawnManager : IInitializable, IDisposable
         {
             UnityEngine.Object.Destroy(_tickAudioClip);
         }
+        
+        FcSpawner.ClearCache();
     }
 
     private IEnumerator LoadAudioClipRoutine()
@@ -114,16 +118,6 @@ public class FcSpawnManager : IInitializable, IDisposable
         _tickAudioClip = loadedClip;
     }
 
-    private System.Collections.IEnumerator PreloadSplashRoutine()
-    {
-        yield return null;
-        _splashCanvasObj = FcSpawner.SpawnDisplay();
-        if (_splashCanvasObj != null)
-        {
-            _splashCanvasObj.SetActive(false);
-        }
-    }
-
     private void OnNoteWasCut(NoteController noteController, in NoteCutInfo noteCutInfo)
     {
         if (_hasTriggeredFc) return;
@@ -170,14 +164,8 @@ public class FcSpawnManager : IInitializable, IDisposable
                 _hasTriggeredFc = true;
                 Plugin.Log.Info("FcSpawnManager: Full Combo'd!");
                 
-                if (_splashCanvasObj != null)
-                {
-                    _splashCanvasObj.SetActive(true);
-                }
-                else
-                {
-                    _splashCanvasObj = FcSpawner.SpawnDisplay();
-                }
+                // Spawn instantly using pre-cached assets (zero disk I/O, zero decoding spike)
+                _splashCanvasObj = FcSpawner.SpawnDisplay();
 
                 if (Config.Instance.Particles.EnableSparkles && _splashCanvasObj != null)
                 {
@@ -239,10 +227,6 @@ public class FcSpawnManager : IInitializable, IDisposable
                 {
                     renderer.material = new Material(shader);
                 }
-                else
-                {
-                    Plugin.Log.Error("FcSpawnManager: Could not find a valid shader for particles!");
-                }
             }
 
             ps.Play();
@@ -262,11 +246,7 @@ public class FcSpawnManager : IInitializable, IDisposable
             var assembly = Assembly.GetExecutingAssembly();
             using (Stream stream = assembly.GetManifestResourceStream(resourcePath))
             {
-                if (stream == null)
-                {
-                    Plugin.Log.Error($"FcSpawnManager: Could not find embedded resource: {resourcePath}");
-                    return null;
-                }
+                if (stream == null) return null;
 
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
