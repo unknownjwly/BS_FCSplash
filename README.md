@@ -30,3 +30,4 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 - [ ] Add settings UI
 - [ ] Add a preview in the settings UI
 - [ ] Add fade transitions
+- [ ] Visual interface for choosing image
