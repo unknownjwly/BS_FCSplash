@@ -25,6 +25,16 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 
 ---
 
+## Dependencies
+
+- SiraUtil ^3.1.0
+- BSML ^1.12.5
+- AssetBundleLoadingTools ^1.1.10
+- BS_Utils
+- HarmonyLib
+
+---
+
 ## To-Do List
 
 - [ ] Add settings UI
