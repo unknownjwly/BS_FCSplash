@@ -7,12 +7,12 @@
     <PluginId>FCSplash</PluginId>
     <PluginName>FCSplash</PluginName>
     <Authors>zjavierf</Authors>
-    <Version>0.3.0</Version>
+    <Version>0.4.1</Version>
     <GameVersion>1.40.8</GameVersion>
     <Description>Shows a splash animation when you FC</Description>
     <!--<PluginIcon></PluginIcon>-->
     <!--<ProjectSource>https://github.com/unknownjwly/BS_FCSplash</ProjectSource>-->
-    <!--<ProjectHome></ProjectHome>-->
+    <!--<ProjectHome>https://github.com/unknownjwly/BS_FCSplash</ProjectHome>-->
     <!--<DonateUrl></DonateUrl>-->
   </PropertyGroup>
 
@@ -20,6 +20,8 @@
   <ItemGroup>
     <DependsOn Include="BSIPA" Version="^4.3.0"/>
     <DependsOn Include="SiraUtil" Version="^3.1.0"/>
+    <DependsOn Include="BeatSaberMarkupLanguage" Version="^1.12.5"/>
+    <DependsOn Include="AssetBundleLoadingTools" Version="^1.1.10"/>
   </ItemGroup>
   
   <PropertyGroup>
