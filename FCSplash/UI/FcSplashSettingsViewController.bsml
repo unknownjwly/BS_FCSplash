@@ -1,0 +1,96 @@
+﻿<bg anchor-pos-y="-20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd">
+
+    <!-- Custom Title -->
+    <horizontal anchor-pos-x="-5" anchor-pos-y="50" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" spacing="4" bg="round-rect-panel" bg-alpha="0.7" pref-height="10" pref-width="50">
+        <text text="FCSplash Settings" font-color="orange" font-size="7" align="Center"/>
+    </horizontal>
+
+    <!-- Exit Button -->
+    <horizontal scale="0.8" anchor-pos-y="50" anchor-pos-x="-40" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="10" pref-height="10">
+        <clickable-image src="FCSplash.Resources.UI.exitIcon.png" on-click="BackButtonPressed" hover-hint="Exit" highlight-color="red"></clickable-image>
+    </horizontal>
+
+    <!-- Respawn Button -->
+    <horizontal anchor-pos-y="50" anchor-pos-x="30" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="10" pref-height="10">
+        <clickable-image src="FCSplash.Resources.UI.previewIcon.png" on-click="RespawnButtonClicked" hover-hint="Preview Splash" default-color="white" highlight-color="cyan"></clickable-image>
+    </horizontal>
+
+    <vertical child-control-width="true" pref-width="100" horizontal-fit="PreferredSize">
+
+        <!-- Tabs Background -->
+        <horizontal anchor-pos-y="2" ignore-layout="true" pivot-y="1" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" bg="panel-top" bg-color="#3F3F3F" pref-height="10" pref-width="110">
+            <text text=" "/>
+        </horizontal>
+
+        <!-- Top-level Tab Bar -->
+        <horizontal vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="100" pref-height="6" pivot-y="1">
+            <tab-select child-expand-width="true" child-control-width="true" tab-tag="mainTabs" id="tabSelector" page-count="5" spacing="-0.16"/>
+        </horizontal>
+
+        <!-- Tab 1: General -->
+        <tab tags="mainTabs" tab-name="  General">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="20" pref-height="60" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <scroll-view spacing="0" pref-height="60" child-expand-width="true">
+                    <toggle-setting apply-on-change="true" text="Mod Enabled" value="mod-enabled" bind-value="true"/>
+                    <horizontal><text text=" " font-size="4" color="#00000000"/></horizontal>
+                    <slider-setting apply-on-change="true" text="Size" integer-only="false" increment="0.1" min="0.1" max="5" show-buttons="true" value="global-scale" bind-value="true"/>
+                    <slider-setting apply-on-change="true" text="Splash Distance (Z-Axis)" integer-only="false" increment="0.5" min="0" max="10" show-buttons="true" value="z-position" bind-value="true"/>
+                    <slider-setting apply-on-change="true" text="Post-Song Wait time (Sec)" integer-only="false" increment="0.5" min="0" max="15" show-buttons="true" value="post-song-wait" bind-value="true"/>
+                    <horizontal><text text=" " font-size="4" color="#00000000"/></horizontal>
+                    <toggle-setting apply-on-change="true" text="Round Corners" value="round-corners" bind-value="true"/>
+                    <toggle-setting apply-on-change="true" text="Randomize Image" value="random-image" bind-value="true"/>
+                </scroll-view>
+            </vertical>
+        </tab>
+
+        <!-- Tab 2: Text -->
+        <tab tags="mainTabs" tab-name="Text">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="20" pref-height="60" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <scroll-view spacing="0" pref-height="60" child-expand-width="true">
+                    <toggle-setting apply-on-change="true" text="Enable Text" value="enable-text" bind-value="true"/>
+                    <toggle-setting apply-on-change="true" text="Enable 3D Text" value="enable-3d-text" bind-value="true"/>
+                    <horizontal><text text=" " font-size="4" color="#00000000"/></horizontal>
+                    <string-setting apply-on-change="true" text="Text" value="text-content" bind-value="true" />
+                    <toggle-setting apply-on-change="true" text="Enable Bold" value="enable-bold" bind-value="true"/>
+                    <toggle-setting apply-on-change="true" text="Enable Italic" value="enable-italic" bind-value="true"/>
+                    <color-setting apply-on-change="true" text="Text Colour" value="text-color" bind-value="true"/>
+                    <horizontal><text text=" " font-size="4" color="#00000000"/></horizontal>
+                    <slider-setting apply-on-change="true" text="Font size" integer-only="false" increment="1" min="10" max="120" show-buttons="true" value="font-size" bind-value="true"/>
+                    <slider-setting apply-on-change="true" text="3D Depth" integer-only="true" increment="1" min="1" max="100" show-buttons="true" value="depth-layers" bind-value="true"/>
+                </scroll-view>
+            </vertical>
+        </tab>
+
+        <!-- Tab 3: Effects -->
+        <tab tags="mainTabs" tab-name=" Effects">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="20" pref-height="60" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <scroll-view spacing="0" pref-height="60" child-expand-width="true">
+                    <toggle-setting apply-on-change="true" text="Enable Effects" value="enable-effects" bind-value="true"/>
+                    <color-setting apply-on-change="true" text="Effect Colour" value="effect-color" bind-value="true"/>
+                </scroll-view>
+            </vertical>
+        </tab>
+
+        <!-- Tab 4: Animations -->
+        <tab tags="mainTabs" tab-name="Anims">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="20" pref-height="60" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <scroll-view spacing="0" pref-height="60" child-expand-width="true">
+                    <slider-setting apply-on-change="true" text="Animation Duration (Secs)" integer-only="false" increment="0.1" min="0.1" max="10" show-buttons="true" value="animation-duration" bind-value="true"/>
+                    <dropdown-list-setting apply-on-change="true" text="Animation Type" options="AnimationTypeChoices" value="SelectedAnimationType" bind-value="true"/>
+                </scroll-view>
+            </vertical>
+        </tab>
+
+        <!-- Tab 5: Audio -->
+        <tab tags="mainTabs" tab-name="Audio">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="20" pref-height="60" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <scroll-view spacing="0" pref-height="60" child-expand-width="true">
+                    <toggle-setting apply-on-change="true" text="Enable Audio" value="enable-audio" bind-value="true"/>
+                    <slider-setting apply-on-change="true" text="Volume" integer-only="false" increment="0.1" min="0" max="1.0" show-buttons="true" value="audio-volume" bind-value="true"/>
+                    <toggle-setting apply-on-change="true" text="Randomize sound" value="random-sound" bind-value="true"/>
+                </scroll-view>
+            </vertical>
+        </tab>
+
+    </vertical>
+</bg>

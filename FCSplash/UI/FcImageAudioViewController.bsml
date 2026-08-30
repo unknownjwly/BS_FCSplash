@@ -1,0 +1,171 @@
+<bg anchor-pos-y="-14" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd">
+
+    <!-- Custom Title -->
+    <horizontal anchor-pos-x="-5" anchor-pos-y="50" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" spacing="4" bg="round-rect-panel" bg-alpha="0.7" pref-height="10" pref-width="50">
+        <text text="Images and Audio" font-color="orange" font-size="7" align="Center"/>
+    </horizontal>
+
+    <!-- Refresh Button -->
+    <horizontal anchor-pos-y="50" anchor-pos-x="30" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="10" pref-height="10">
+        <clickable-image src="FCSplash.Resources.UI.refreshIcon.png" on-click="reloadImages/Sounds" hover-hint="Refresh" highlight-color="lime"/>
+    </horizontal>
+
+    <!-- Images Tab Icon-->
+    <horizontal anchor-pos-y="35" anchor-pos-x="-23" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="10" pref-height="10">
+        <image scale="0.7" src="FCSplash.Resources.UI.imageIcon.png" hover-hint="Images"></image>
+    </horizontal>
+
+    <!-- Audio Tab Icon -->
+    <horizontal anchor-pos-y="35" anchor-pos-x="24" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="10" pref-height="10">
+        <image scale="0.7" src="FCSplash.Resources.UI.soundIcon.png" hover-hint="Audio"></image>
+    </horizontal>
+
+    <!-- Github Icon -->
+    <horizontal anchor-pos-y="50" anchor-pos-x="-35" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="10" pref-height="10">
+        <clickable-image scale="0.7" src="FCSplash.Resources.UI.githubIcon.png" hover-hint="Open Github link" on-click="open-github-modal"/>
+    </horizontal>
+
+    <modal id="githubModal" size-delta-x="70" size-delta-y="30" bg="round-rect-panel">
+        <vertical spacing="4" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pad="4">
+            <text text="Open GitHub Link in New Tab?" font-size="4" align="Center"/>
+            <horizontal spacing="6">
+                <action-button text="Open" face-color="lime" on-click="confirm-github" pref-width="25" pref-height="8"/>
+                <action-button text="Cancel" face-color="red" on-click="close-github-modal" pref-width="25" pref-height="8"/>
+            </horizontal>
+        </vertical>
+    </modal>
+
+    <!-- Delete Modal -->
+    <modal id="deleteModal" size-delta-x="70" size-delta-y="30" bg="round-rect-panel">
+        <vertical spacing="4" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pad="4">
+            <text text="Are you sure you want to DELETE this file?" font-size="4" align="Center"/>
+            <horizontal spacing="6">
+                <action-button text="Yes" face-color="lime" on-click="confirm-delete" pref-width="25" pref-height="8"/>
+                <action-button text="Cancel" face-color="red" on-click="cancel-delete" pref-width="25" pref-height="8"/>
+            </horizontal>
+        </vertical>
+    </modal>
+
+    <vertical child-control-width="true" pref-width="100" horizontal-fit="PreferredSize">
+
+        <!-- Tabs Background -->
+        <horizontal anchor-pos-y="2" ignore-layout="true" pivot-y="1" vertical-fit="PreferredSize" horizontal-fit="PreferredSize" bg="panel-top" bg-color="#3F3F3F" pref-height="14" pref-width="100">
+            <text text=" "/>
+        </horizontal>
+
+        <!-- Top-level Tab Bar -->
+        <horizontal vertical-fit="PreferredSize" horizontal-fit="PreferredSize" pref-width="90" pref-height="10" pivot-y="1" spacing="1">
+            <tab-select child-expand-width="true" child-control-width="true" tab-tag="mainTabs" id="tabSelector" page-count="5" spacing="-0.16"/>
+        </horizontal>
+
+        <!-- Tab 1: Images -->
+        <tab tags="mainTabs" tab-name=" ">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="15" pref-height="65" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <horizontal spacing="2" horizontal-fit="PreferredSize">
+                    <text text="~image-count-text" font-size="3.5" font-color="#AAAAAA" align="Left" />
+                    <text text="Selected Image :" bold="true" font-color="lightblue" font-size="5"/>
+                    <text text="~selected-image-display" bold="true" font-color="lightblue" font-size="5"/>
+                </horizontal>
+                <img src="#WhitePixel" pref-height="0.4" pref-width="80" img-color="#888888" />
+                <custom-list id="imageList" contents="image-row-list" pref-height="60" pref-width="56" cell-size="32" active="~has-images" show-scrollbar="true">
+                    <horizontal anchor-pos-y="3" spacing="4" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" child-align="MiddleCenter">
+
+                        <!-- Left Item Row -->
+                        <horizontal spacing="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" active="~has-left" child-align="MiddleCenter">
+                            <!-- Delete Icon Outside Box (Left) -->
+                            <clickable-image src="FCSplash.Resources.UI.deleteIcon.png" on-click="left-delete" default-color="red" pref-width="20" pref-height="0" scale="0.5" hover-hint="Delete Image"/>
+
+                            <!-- Background Box -->
+                            <stack pref-width="26" pref-height="20">
+                                <clickable-image src="FCSplash.Resources.UI.bgButton.png" on-click="left-select" hover-hint="Press to select Image" pref-width="26" pref-height="20"/>
+                                <vertical vertical-fit="PreferredSize" horizontal-fit="PreferredSize" spacing="1" pad="1">
+                                    <clickable-image src="~left-file-path" on-click="left-select" hover-hint="Press to select Image" pref-width="12" pref-height="10" preserve-aspect="true" loading-animation="true"/>
+                                    <clickable-text text="~left-name" default-color="~left-color" on-click="left-select" hover-hint="Press to select Image" font-size="3" align="Center" pref-width="24" overflow-mode="Ellipsis"/>
+                                </vertical>
+                            </stack>
+                        </horizontal>
+
+                        <!-- Right Item Row -->
+                        <horizontal spacing="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" active="~has-right" child-align="MiddleCenter">
+                            <!-- Background Box -->
+                            <stack pref-width="26" pref-height="20">
+                                <clickable-image src="FCSplash.Resources.UI.bgButton.png" hover-hint="Press to select Image" on-click="right-select" pref-width="26" pref-height="20"/>
+                                <vertical vertical-fit="PreferredSize" horizontal-fit="PreferredSize" spacing="1" pad="1">
+                                    <clickable-image src="~right-file-path" on-click="right-select" hover-hint="Press to select Image" pref-width="12" pref-height="10" preserve-aspect="true" loading-animation="true"/>
+                                    <clickable-text text="~right-name" default-color="~right-color" on-click="right-select" hover-hint="Press to select Image" font-size="3" align="Center" pref-width="24" overflow-mode="Ellipsis"/>
+                                </vertical>
+                            </stack>
+
+                            <!-- Delete Icon Outside Box (Right) -->
+                            <clickable-image src="FCSplash.Resources.UI.deleteIcon.png" on-click="right-delete" default-color="red" pref-width="20" pref-height="0" scale="0.5" hover-hint="Delete Image"/>
+                        </horizontal>
+
+                    </horizontal>
+                </custom-list>
+
+                <!-- Empty State Hint (Visible when no images exist) -->
+                <vertical vertical-fit="PreferredSize" horizontal-fit="PreferredSize" active="~has-no-images" pref-height="50" pref-width="100" child-align="MiddleCenter" spacing="2">
+                    <text text="No images found!" font-size="5" font-color="yellow" align="Center"/>
+                    <text text="Drop images or GIFs into:" font-size="4" align="Center"/>
+                    <text text="UserData / FCSplash / Images &amp; Gifs" font-size="3.5" font-color="lightblue" align="Center"/>
+                </vertical>
+            </vertical>
+        </tab>
+
+        <!-- Tab 2: Audio Grid -->
+        <tab tags="mainTabs" tab-name=" ">
+            <vertical vertical-fit="PreferredSize" anchor-pos-y="15" pref-height="65" pref-width="110" bg="round-rect-panel" bg-alpha="0.7">
+                <horizontal spacing="1" horizontal-fit="PreferredSize">
+                    <text text="~audio-count-text" font-size="3.5" font-color="#AAAAAA" align="Left"/>
+                    <text text="Selected Audio :" bold="true" font-color="lightblue" font-size="5"/>
+                    <text text="~selected-audio-display" bold="true" font-color="lightblue" font-size="5"/>
+                </horizontal>
+                <!-- Thin line separator -->
+                <img src="#WhitePixel" pref-height="0.4" pref-width="80" color="#888888" />
+                <custom-list id="audioList" contents="audio-list" pref-height="60" pref-width="56" cell-size="32" active="~has-audio" show-scrollbar="true">
+                    <horizontal anchor-pos-y="3" spacing="4" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" child-align="MiddleCenter">
+
+                        <!-- Left Item Row -->
+                        <horizontal spacing="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" active="~has-left" child-align="MiddleCenter">
+                            <!-- Delete Icon Outside Box (Left) -->
+                            <clickable-image src="FCSplash.Resources.UI.deleteIcon.png" on-click="left-delete" default-color="red" pref-width="20" pref-height="0" scale="0.5" hover-hint="Delete Audio" />
+
+                            <!-- Background Box -->
+                            <stack pref-width="26" pref-height="20">
+                                <clickable-image src="FCSplash.Resources.UI.bgButton.png" on-click="left-select" hover-hint="Press to select Audio" pref-width="26" pref-height="20"/>
+                                <vertical vertical-fit="PreferredSize" horizontal-fit="PreferredSize" spacing="1" pad="1">
+                                    <clickable-image src="FCSplash.Resources.UI.soundIcon.png" on-click="left-preview" pref-width="8" pref-height="8" hover-hint="Preview Audio" preserve-aspect="true"/>
+                                    <clickable-text text="~left-name" default-color="~left-color" on-click="left-select" hover-hint="Press to select Audio" font-size="3" align="Center" pref-width="24" overflow-mode="Ellipsis"/>
+                                </vertical>
+                            </stack>
+                        </horizontal>
+
+                        <!-- Right Item Row -->
+                        <horizontal spacing="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" active="~has-right" child-align="MiddleCenter">
+                            <!-- Background Box -->
+                            <stack pref-width="26" pref-height="20">
+                                <clickable-image src="FCSplash.Resources.UI.bgButton.png" hover-hint="Press to select Audio" on-click="right-select" pref-width="26" pref-height="20"/>
+                                <vertical vertical-fit="PreferredSize" horizontal-fit="PreferredSize" spacing="1" pad="1">
+                                    <clickable-image src="FCSplash.Resources.UI.soundIcon.png" on-click="right-preview" pref-width="8" pref-height="8" hover-hint="Preview Audio" preserve-aspect="true"/>
+                                    <clickable-text text="~right-name" default-color="~right-color" on-click="right-select" hover-hint="Press to select Audio" font-size="3" align="Center" pref-width="24" overflow-mode="Ellipsis"/>
+                                </vertical>
+                            </stack>
+
+                            <!-- Delete Icon Outside Box (Right) -->
+                            <clickable-image src="FCSplash.Resources.UI.deleteIcon.png" on-click="right-delete" default-color="red" pref-width="20" pref-height="0" scale="0.5" hover-hint="Delete Audio"/>
+                        </horizontal>
+
+                    </horizontal>
+                </custom-list>
+
+                <!-- Empty State Hint (Visible when no audio exists) -->
+                <vertical vertical-fit="PreferredSize" horizontal-fit="PreferredSize" active="~has-no-audio" pref-height="50" pref-width="100" child-align="MiddleCenter" spacing="2">
+                    <text text="No audio files found!" font-size="5" font-color="yellow" align="Center"/>
+                    <text text="Drop audio files (.ogg, .wav, .mp3) into:" font-size="4" align="Center"/>
+                    <text text="UserData / FCSplash / Sounds" font-size="3.5" font-color="lightblue" align="Center"/>
+                </vertical>
+            </vertical>
+        </tab>
+
+    </vertical>
+</bg>
