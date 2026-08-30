@@ -26,8 +26,8 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 
 1. Launch Beat Saber once with Mod installed to generate the necessary folders
 2. Place 1 or more images in "UserData/FCSplash/Images & Gifs"
-3. [OPTIONAL] Add your own custom sound effect to play when the FCSplash appears
-4. Configure your settings in UserData/FCSplash.json
+3. [OPTIONAL] Place 1 or more sounds in "UserData/FCSplash/Sounds"
+4. Configure your settings in the In-Game Mod Menu
 3. Full Combo (FC) a song.
 
 ---
@@ -41,10 +41,3 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 - HarmonyLib
 
 ---
-
-## To-Do List
-
-- [ ] Add settings UI
-- [ ] Add a preview in the settings UI
-- [ ] Add fade transitions
-- [ ] Visual interface for choosing image
