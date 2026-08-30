@@ -14,6 +14,13 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 </div>
 
 ---
+# Screenshots
+
+<img width="800" height="469" alt="FCSplash v0 4 1 UI Sounds" src="https://github.com/user-attachments/assets/9c381d15-9945-41f9-a925-abaa9c65fd86" />
+<img width="917" height="560" alt="FCSplash v0 4 1 UI Settings" src="https://github.com/user-attachments/assets/7bf25dca-fda4-4be8-8943-8754e34fce86" />
+<img width="800" height="469" alt="FCSplash v0 4 1 UI Images" src="https://github.com/user-attachments/assets/b4ce3841-bb66-4883-ae73-389ac6b9ba81" />
+
+---
 
 ## Usage
 
