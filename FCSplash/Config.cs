@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using IPA.Utilities;
 using Newtonsoft.Json;
 
@@ -25,11 +25,13 @@ public class Config
 
     public class GeneralSettings
     {
+        public bool EnableMod { get; set; } = true;
         public float GlobalScaleMultiplier { get; set; } = 0.7f;
         public float ZPositionDistance { get; set; } = 3.5f;
         public float LevelFinishDelay { get; set; } = 2.0f;
         public bool EnableRoundCorners { get; set; } = true;
         public bool EnableRandomImage { get; set; } = false;
+        public string SelectedImage { get; set; } = string.Empty;
     }
 
     public class TextSettings
@@ -65,9 +67,24 @@ public class Config
     {
         public bool EnableAudio { get; set; } = true;
         public float AudioVolume { get; set; } = 1.0f;
+        public bool RandomAudio { get; set; } = false;
+        public string SelectedAudio { get; set; } = string.Empty;
     }
 
     private static readonly string ConfigPath = Path.Combine(UnityGame.UserDataPath, "FCSplash.json");
+
+    private static void ClampValues()
+    {
+        Instance.Text.FontSize = UnityEngine.Mathf.Clamp(Instance.Text.FontSize, 1, 200);
+        Instance.Text.TextColorR = UnityEngine.Mathf.Clamp(Instance.Text.TextColorR, 0, 255);
+        Instance.Text.TextColorG = UnityEngine.Mathf.Clamp(Instance.Text.TextColorG, 0, 255);
+        Instance.Text.TextColorB = UnityEngine.Mathf.Clamp(Instance.Text.TextColorB, 0, 255);
+        Instance.Particles.SparkleColorR = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorR, 0, 255);
+        Instance.Particles.SparkleColorG = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorG, 0, 255);
+        Instance.Particles.SparkleColorB = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorB, 0, 255);
+        Instance.Animation.AnimationDuration = UnityEngine.Mathf.Clamp(Instance.Animation.AnimationDuration, 0.1f, 5.0f);
+        Instance.Audio.AudioVolume = UnityEngine.Mathf.Clamp(Instance.Audio.AudioVolume, 0.1f, 1.0f);
+    }
 
     public static void Load()
     {
@@ -77,16 +94,7 @@ public class Config
             {
                 string json = File.ReadAllText(ConfigPath);
                 Instance = JsonConvert.DeserializeObject<Config>(json) ?? new Config();
-                
-                Instance.Text.FontSize = UnityEngine.Mathf.Clamp(Instance.Text.FontSize, 1, 200);
-                Instance.Text.TextColorR = UnityEngine.Mathf.Clamp(Instance.Text.TextColorR, 0, 255);
-                Instance.Text.TextColorG = UnityEngine.Mathf.Clamp(Instance.Text.TextColorG, 0, 255);
-                Instance.Text.TextColorB = UnityEngine.Mathf.Clamp(Instance.Text.TextColorB, 0, 255);
-                Instance.Particles.SparkleColorR = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorR, 0, 255);
-                Instance.Particles.SparkleColorG = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorG, 0, 255);
-                Instance.Particles.SparkleColorB = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorB, 0, 255);
-                Instance.Animation.AnimationDuration = UnityEngine.Mathf.Clamp(Instance.Animation.AnimationDuration, 0.1f, 5.0f);
-                Instance.Audio.AudioVolume = UnityEngine.Mathf.Clamp(Instance.Audio.AudioVolume, 0.1f, 1.0f);
+                ClampValues();
             }
             else
             {
@@ -104,16 +112,7 @@ public class Config
     {
         try
         {
-            Instance.Text.FontSize = UnityEngine.Mathf.Clamp(Instance.Text.FontSize, 1, 200);
-            Instance.Text.TextColorR = UnityEngine.Mathf.Clamp(Instance.Text.TextColorR, 0, 255);
-            Instance.Text.TextColorG = UnityEngine.Mathf.Clamp(Instance.Text.TextColorG, 0, 255);
-            Instance.Text.TextColorB = UnityEngine.Mathf.Clamp(Instance.Text.TextColorB, 0, 255);
-            Instance.Particles.SparkleColorR = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorR, 0, 255);
-            Instance.Particles.SparkleColorG = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorG, 0, 255);
-            Instance.Particles.SparkleColorB = UnityEngine.Mathf.Clamp(Instance.Particles.SparkleColorB, 0, 255);
-            Instance.Animation.AnimationDuration = UnityEngine.Mathf.Clamp(Instance.Animation.AnimationDuration, 0.1f, 5.0f);
-            Instance.Audio.AudioVolume = UnityEngine.Mathf.Clamp(Instance.Audio.AudioVolume, 0.1f, 1.0f);
-
+            ClampValues();
             string json = JsonConvert.SerializeObject(Instance, Formatting.Indented);
             File.WriteAllText(ConfigPath, json);
         }
