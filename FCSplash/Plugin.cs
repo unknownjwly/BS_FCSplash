@@ -1,9 +1,13 @@
 using System.IO;
+using System.Collections;
 using HarmonyLib;
 using IPA;
 using IPA.Utilities;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
+using FCSplash.UI;
+using FCSplash.Features;
+using FCSplash.Features.Spawning;
 
 namespace FCSplash;
 
@@ -12,6 +16,7 @@ public class Plugin
 {
     internal static Plugin Instance { get; private set; } = null!;
     internal static IPALogger Log { get; private set; } = null!;
+    internal static SplashAudioManager AudioManager { get; private set; } = null!;
 
     private Harmony? _harmony;
 
@@ -20,12 +25,14 @@ public class Plugin
     {
         Instance = this;
         Log = logger;
+        AudioManager = new SplashAudioManager();
 
         Config.Load();
         CreateRequiredFolders();
 
         zenjector.UseLogger(logger);
-        zenjector.Install<FcSpawnInstaller>(Location.Player);
+        zenjector.Install<FcInstaller>(Location.Player);
+        zenjector.Install<FcMenuInstaller>(Location.Menu);
     }
 
     private void CreateRequiredFolders()
@@ -44,12 +51,24 @@ public class Plugin
     {
         _harmony = new Harmony("com.fcsplash.mod");
         _harmony.PatchAll();
+        
+        BSMLHelper.ExtractAndEnsureCache("FcImageAudioViewController.bsml");
+        
+        SharedCoroutineStarter.instance.StartCoroutine(PreloadStartupAssetsRoutine());
+
         Log.Info("FCSplash initialized");
+    }
+
+    private IEnumerator PreloadStartupAssetsRoutine()
+    {
+        FcSpawner.InitializeOnStartup();
+        yield return AudioManager.LoadAudioClipRoutine();
     }
 
     [OnDisable]
     public void OnDisable()
     {
+        AudioManager.Cleanup();
         _harmony?.UnpatchSelf();
         _harmony = null;
     }
