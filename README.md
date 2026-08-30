@@ -22,6 +22,20 @@ A Beat Saber mod that adds a splash animation at the end if you FC a song with c
 
 ---
 
+# Features
+
+- Very In-depth UI
+- 3D Text
+- Custom text
+- Dynamic rounded corners on all images/gifs
+- Randomize Image and Audio Feature
+- Particle/Fireworks when you FC
+- Delays taking you back to the results screen so you can appreciate the mod
+- Custom Audio and Pre-Packaged audio
+- Smooth Animations
+
+---
+
 ## Usage
 
 1. Launch Beat Saber once with Mod installed to generate the necessary folders
